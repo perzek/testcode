@@ -5,8 +5,6 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.BitSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,26 +15,26 @@ public class Encoder {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(Encoder.class);
 
-    public List<Codeword> generateCodes(String message) {
+    public Map<String, Codeword> generateCodes(String message) {
         Set<Codeword> codewords = orderCodewordsByProbability(message);
 
-        createHuffmanTree(codewords);
-        //TODO
+        HuffmanTree<Codeword> huffmanTree = createHuffmanTree(codewords);
 
-        return null;
+        return huffmanTree.getCodeMapping();
 
     }
 
-    private HuffmanTreeNode<Codeword> createHuffmanTree(Set<Codeword> codewords) {
-        //TODO
-        return null;
+    private HuffmanTree<Codeword> createHuffmanTree(Set<Codeword> codewords) {
+        HuffmanTree<Codeword> tree = new HuffmanTree<>(codewords);
+        LOGGER.info("Created tree {}", tree);
+        return tree;
     }
 
     public Set<Codeword> orderCodewordsByProbability(String message) {
         char[] charArray = message.toCharArray();
         Map<Character, Integer> wordCount = countEachWord(charArray);
 
-        Set<Codeword> orderedCodewords = Sets.newTreeSet((o1, o2) -> (Double.compare(o2.getProbability(), o1.getProbability())));
+        Set<Codeword> orderedCodewords = Sets.newTreeSet((o1, o2) -> (Double.compare(o1.getProbability(), o2.getProbability())));
 
         for (Map.Entry<Character, Integer> entry : wordCount.entrySet()) {
             orderedCodewords.add(new Codeword(entry.getKey(), entry.getValue() / (double) charArray.length));
@@ -50,7 +48,6 @@ public class Encoder {
         LOGGER.debug("Input param: [{}]", message);
         Map<Character, Integer> result = Maps.newHashMap();
 
-
         for (char c : message) {
 
             Integer integer = result.get(c);
@@ -61,42 +58,6 @@ public class Encoder {
         }
 
         return result;
-    }
-
-    public static class Codeword implements ProbabilityAware {
-        private final double probability;
-        private final char character;
-        private final BitSet code;
-
-        public Codeword(char character, double probability) {
-            this(character, probability, null);
-        }
-
-        public Codeword(char character, double probability, BitSet code) {
-            this.code = code;
-            this.character = character;
-            this.probability = probability;
-        }
-
-        public Codeword addCode(BitSet code) {
-            return new Codeword(character, probability, code);
-        }
-
-        public double getProbability() {
-            return probability;
-        }
-
-        public char getCharacter() {
-            return character;
-        }
-
-        @Override
-        public String toString() {
-            return "Codeword{" +
-                    "probability=" + probability +
-                    ", character=" + character +
-                    '}';
-        }
     }
 
 }

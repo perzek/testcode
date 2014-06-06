@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class EncoderTest {
@@ -48,7 +49,7 @@ public class EncoderTest {
     @Test
     public void testOrderingCodewords() {
         Encoder e = new Encoder();
-        Set<Encoder.Codeword> codewords = e.orderCodewordsByProbability(generateMessage(new int[]{3, 4, 5}));
+        Set<Codeword> codewords = e.orderCodewordsByProbability(generateMessage(new int[]{3, 4, 5}));
         LOGGER.info("Set: {}", codewords);
     }
 
@@ -56,7 +57,13 @@ public class EncoderTest {
     public void testGenerateCodes() {
         Encoder e = new Encoder();
 
-        e.generateCodes(generateMessage(new int[]{3, 4, 5}));
+        Map<String, Codeword> stringCodewordMap = e.generateCodes(generateMessage(new int[]{3, 10, 15}));
+        assertThat(stringCodewordMap.get("00"), notNullValue());
+        assertThat(stringCodewordMap.get("01"), notNullValue());
+        assertThat(stringCodewordMap.get("1"), notNullValue());
+        assertThat(stringCodewordMap.get("00").getCharacter(), is('a'));
+        assertThat(stringCodewordMap.get("01").getCharacter(), is('b'));
+        assertThat(stringCodewordMap.get("1").getCharacter(), is('c'));
     }
 
     private String generateMessage(int[] counts) {

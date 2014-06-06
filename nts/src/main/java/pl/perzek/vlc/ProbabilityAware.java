@@ -6,4 +6,5 @@ package pl.perzek.vlc;
 public interface ProbabilityAware {
 
     public double getProbability();
+
 }
